@@ -55,6 +55,13 @@ void setup() {
 
   sei(); //Global kesmeler devrede
 
+  //Nucleo 1 tetikleme yaparak I2C haberleşme başlatıldı.
+  digitalWrite(8, HIGH);//Merkezi tetikleyen pin aktif
+  TCNT1 = 64285;// 65535-64285(1024 prescaler)=~80 ms --- 1 sn 15625
+  TIFR1 |= (1 << TOV1) ;//timer1 taşma bayragı sıfırlanır.
+  TIMSK1 |= (1 << TOIE1) ;// Timer1 taşma kesmesi aktif
+  hazir = false;
+
 }
 
 void loop() {
@@ -70,9 +77,9 @@ void loop() {
 
   ADCSRA |= (1 << ADSC); //ADC dönüşüm başlatma bayragını aktif etme, dönüşüm bittiğinde "0" olur.
   /*
-  if (yeni_atis == true) {
+    if (yeni_atis == true) {
     yeni_atis = false;
-  }*/
+    }*/
 
   /*
     if (SlaveReceived == 21) //reset
@@ -162,7 +169,7 @@ ISR(ADC_vect) {
       if (hazir == true) {
         farkCikarma = fark;
         sayac++;
-        sayac = sayac % 256;
+        sayac = sayac % 100; //sayac = sayac % 256;
 
         //Serial.write(sayac);
         //digitalWrite(13, HIGH);Buzzer Yerine merkez tetiklenecek
